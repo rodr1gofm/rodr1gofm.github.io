@@ -50,6 +50,7 @@
   h2{font:700 clamp(1.8rem,3.4vw,2.4rem)/1.1 "Bricolage Grotesque",sans-serif;letter-spacing:-.01em;margin:0 0 8px}
   .section-intro{color:var(--muted);margin:0 0 40px;max-width:40em}
   section.wrap{padding:56px 28px;border-top:1px solid var(--line)}
+  section.wrap:last-of-type{padding-bottom:96px}
 
   .project{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start;padding:44px 0}
   .project + .project{border-top:1px dashed var(--line)}
@@ -85,16 +86,14 @@
   .more li::before{content:"";position:absolute;left:0;top:.5em;width:10px;height:10px;background:var(--frontier);border:2px solid var(--wall)}
   .more b{font-weight:600}
 
-  footer.wrap{border-top:1px solid var(--line);padding:56px 28px 72px}
-  footer p{margin:0 0 16px;max-width:40em}
 
+  @media (prefers-reduced-motion:reduce){ .c{transition:none} }
   @media (max-width:820px){
     .wrap.hero{grid-template-columns:1fr;padding:56px 28px 40px;gap:36px}
     .maze-box{max-width:360px}
     .project{grid-template-columns:1fr;gap:24px}
     .project .media{order:2}
   }
-  @media (prefers-reduced-motion:reduce){ .c{transition:none} }
 </style>
 </head>
 <body>
@@ -207,20 +206,10 @@
   </section>
 </main>
 
-<footer class="wrap">
-  <h2>Vamos conversar</h2>
-  <p>Estou procurando um estágio em que eu possa usar IA para resolver problemas de verdade em planejamento e operações.</p>
-  <ul class="contact">
-    <li><a href="mailto:rodrigofdm09@gmail.com">rodrigofdm09@gmail.com</a></li>
-    <li><a href="https://www.linkedin.com/in/rodrigo-franco-de-moraes-0a883a307">LinkedIn</a></li>
-    <li><a href="https://github.com/rodr1gofm">GitHub</a></li>
-  </ul>
-</footer>
 
 <script>
 (function(){
   const N=8, el=document.getElementById('maze');
-  // deterministic maze (recursive backtracker with seeded RNG)
   let s=7; const rnd=()=>{s=(s*16807)%2147483647;return s/2147483647};
   const walls=[...Array(N*N)].map(()=>({n:1,s:1,w:1,e:1}));
   const seen=new Array(N*N).fill(false), stack=[0]; seen[0]=true;
@@ -232,14 +221,12 @@
     if(!opts.length){stack.pop();continue}
     const [j,a,b]=opts[(rnd()*opts.length)|0];
     walls[c][a]=0; walls[j][b]=0; seen[j]=true; stack.push(j)}
-  // remove a few extra walls so BFS fans out
   for(let k=0;k<10;k++){const i=(rnd()*N*N)|0;const o=nb(i);const [j,a,b]=o[(rnd()*o.length)|0];walls[i][a]=0;walls[j][b]=0}
   const cells=walls.map((w,i)=>{const d=document.createElement('div');d.className='c';
     const x=i%N,y=(i/N)|0;
     if(w.n&&y>0)d.classList.add('wn'); if(w.w&&x>0)d.classList.add('ww');
     el.appendChild(d); return d});
   const open=(i,dir)=>!walls[i][dir];
-  // BFS order
   const steps=[], dist=new Array(N*N).fill(-1), q=[0]; dist[0]=0;
   while(q.length){const c=q.shift(); const add=[];
     for(const [j,a] of nb(c)) if(open(c,a)&&dist[j]<0){dist[j]=dist[c]+1;q.push(j);add.push(j)}
